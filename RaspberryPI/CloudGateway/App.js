@@ -3,15 +3,31 @@
   https://github.com/voodootikigod/node-serialport
   npm install serialport
 */
+var portName = 'COM3';
 var serialport = require("../serialport");
 var SerialPort = serialport.SerialPort;
-var sp = new SerialPort("COM3", {
+var sp = new SerialPort(portName, {
   baudrate: 9600,
-  parser: serialport.parsers.raw
-}, true);
-sp.on('open', function(){
-  console.log('Serial Port Opened');
-  serialport.on('data', function(data){
-    console.log(data.toString());
-  });
+  dataBits: 8,
+  parity: 'none',
+  stopBits: 1,
+  parser: serialport.parsers.readline("\n")
+}, false);
+
+sp.on('data', function(data) {
+  var text = data.toString();
+  console.log(text);
+  var msg = JSON.parse(text);
+  console.log(msg.humidity);
+});
+sp.open(function(err){
+  if (err)
+  {
+    console.log('Error Opening Port ' + portName);
+    sp.close();
+  }
+  else
+  {
+    console.log('Opened Port ' + portName);
+  }
 });

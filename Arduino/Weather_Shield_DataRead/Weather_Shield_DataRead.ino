@@ -34,7 +34,7 @@ void setup() {
   // initialize digital pin 13 as an output.
   
   Serial.begin(9600);
-  Serial.println("Weather Shield Test");
+  //Serial.println("Weather Shield setup");
 
   pinMode(STAT1, OUTPUT); //Status LED Blue
   pinMode(STAT2, OUTPUT); //Status LED Green
@@ -51,7 +51,7 @@ void setup() {
   //Configure the humidity sensor
   myHumidity.begin();
   
-  Serial.println("Weather Shield online!");
+  //Serial.println("Weather Shield online!");
 }
 
 // the loop function runs over and over again forever
@@ -138,17 +138,16 @@ float get_battery_level()
 //I don't like the way this function is written but Arduino doesn't support floats under sprintf
 void printWeather()
 {
-  Serial.print("$,humidity=");
+  Serial.print("{\"humidity\":");
   Serial.print(humidity, 2);
-  Serial.print(",temp=");
+  Serial.print(",\"temp\":");
   Serial.print(tempc, 2);
-  Serial.print(",pressure=");
+  Serial.print(",\"pressure\":");
   Serial.print(pressure, 2);
-  Serial.print(",batt_lvl=");
+  Serial.print(",\"batt_lvl\":");
   Serial.print(batt_lvl, 2);
-  Serial.print(",light_lvl=");
+  Serial.print(",\"light_lvl\":");
   Serial.print(light_lvl, 2);
-  Serial.print(",");
-  Serial.println("#");
+  Serial.println("}");
 }
 
