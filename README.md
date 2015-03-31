@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Setup
 =========
 Install NodeJS on RaspberryPi (Raspbian)
@@ -28,3 +29,7 @@ Keywords:
 	- Arduino
 	- RaspberryPi
 	- NodeJS
+=======
+# CoolerAlert
+IoT Project with Arduino, RaspberryPi &amp; Azure 
+>>>>>>> 1e572f7359d6c6538e84f4ecd3a4d10b16389dec
