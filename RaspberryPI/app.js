@@ -16,11 +16,20 @@ var sp = new SerialPort(portName, {
 
 sp.on('data', function(data) {
   var text = data.toString();
-  console.log(text);
+  //console.log(text);
   if (text.indexOf('{') == 0)
   {
-    var  msg = JSON.parse(text);
-    console.log('Humidity ' + msg.humidity);
+    try {
+       var  msg = JSON.parse(text);
+       console.log('Temperature = ' + msg.temp);
+       console.log('Humidity = ' + msg.humidity);
+       console.log('Pressure = ' + msg.pressure);
+       console.log('Light level = ' + msg.light_lvl);
+       console.log('----------------------');
+    }
+    catch (e) {
+       console.log('Error Parsing Data');
+    }
   }
 });
 sp.open(function(err){
