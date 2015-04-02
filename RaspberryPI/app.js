@@ -4,7 +4,7 @@
   npm install serialport
 */
 var portName = '/dev/ttyACM0';
-var serialport = require("./node_modules/serialport");
+var serialport = require("serialport");
 var SerialPort = serialport.SerialPort;
 var sp = new SerialPort(portName, {
   baudrate: 9600,
