@@ -1,11 +1,26 @@
-/*
-  Uses serialport
-  https://github.com/voodootikigod/node-serialport
-  npm install serialport
-*/
-var portName = '/dev/ttyACM0';
+
+var  config = require('./config');
 var serialport = require("serialport");
-var SerialPort = serialport.SerialPort;
+var AMQPClient = require('amqp10');
+
+var connected = false;
+
+var uri = 'amqps://' + encodeURIComponent(config.sasName) + ':' + encodeURIComponent(config.sasKey) + '@' + config.serviceBusHost;
+var sendAddr = config.eventHubName;
+
+var client = new AMQPClient(AMQPClient.policies.EventHubPolicy); // Uses PolicyBase default policy
+client.connect(uri, function(conn_err) {
+  if (conn_err)
+  {
+    console.log('Error connecting to Event Hub (' + conn_err + ')');
+  }
+  else
+  {
+    console.log('Connected to Event Hub');
+    connected = true;
+  }
+});
+
 var sp = new SerialPort(portName, {
   baudrate: 9600,
   dataBits: 8,
@@ -20,12 +35,9 @@ sp.on('data', function(data) {
   if (text.indexOf('{') == 0)
   {
     try {
-       var  msg = JSON.parse(text);
-       console.log('Temperature = ' + msg.temp);
-       console.log('Humidity = ' + msg.humidity);
-       console.log('Pressure = ' + msg.pressure);
-       console.log('Light level = ' + msg.light_lvl);
-       console.log('----------------------');
+       var sensorData = JSON.parse(text);
+       sensorData.sensorId = 'arduino01';
+       sendData(sensorData);
     }
     catch (e) {
        console.log('Error Parsing Data');
@@ -35,11 +47,29 @@ sp.on('data', function(data) {
 sp.open(function(err){
   if (err)
   {
-    console.log('Error Opening Port ' + portName);
+    console.log('Error Opening Port ' + config.portName);
     sp.close();
   }
   else
   {
-    console.log('Opened Port ' + portName);
+    console.log('Opened Port ' + config.portName);
   }
 });
+
+function sendData(sensorData)
+{
+  if (connected)
+  {
+      var partitionKey = '00';
+      var message = JSON.stringify(sensorData);
+      client.send(message, sendAddr,
+                { 'x-opt-partition-key' : partitionKey },
+                   function(err) {
+                     if (err)
+                       console.log(err);
+                     else
+                       console.log('Message Enqueued:' + message);
+                }
+             );
+  }
+}
