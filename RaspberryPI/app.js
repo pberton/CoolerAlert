@@ -1,6 +1,7 @@
 
-var  config = require('./config');
-var serialport = require("serialport");
+var config = require('./config.js');
+var serialport = require('serialport');
+var SerialPort = serialport.SerialPort; // localize object constructor
 var AMQPClient = require('amqp10');
 
 var connected = false;
@@ -21,7 +22,8 @@ client.connect(uri, function(conn_err) {
   }
 });
 
-var sp = new SerialPort(portName, {
+
+var sp = new SerialPort(config.portName, {
   baudrate: 9600,
   dataBits: 8,
   parity: 'none',
@@ -60,7 +62,7 @@ function sendData(sensorData)
 {
   if (connected)
   {
-      var partitionKey = '00';
+      var partitionKey = '0';
       var message = JSON.stringify(sensorData);
       client.send(message, sendAddr,
                 { 'x-opt-partition-key' : partitionKey },
